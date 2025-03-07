@@ -1,0 +1,26 @@
+@font-face {
+  font-family: "CeraPro";
+  src: url("./assets/fonts/CeraPro-Light.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+  font-family: "CeraPro", sans-serif;
+  margin: 0;
+  background-color: #ffffff;
+}
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #000;
+  text-decoration: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}

@@ -1,8 +1,13 @@
 import {getUser} from "./get-user.js";
 import {addUser} from "./add-user.js";
-import {createSession} from "react-router-dom";
+import {sessions} from "./sessions.js";
+
 
 export const server = {
+    async logout(session) {
+        sessions.remove(session);
+
+    },
     async authorize(authLogin, authPassword) {
         const user = await getUser(authLogin, authPassword);
         if (!user) {
@@ -16,9 +21,14 @@ export const server = {
             }
         }
 
-
         return {
-            error: null, result: createSession(user.role_id)
+            error: null, result: {
+                id: user.id,
+                name: user.name,
+                login: user.login,
+                roleId: user.role_id,
+                session: sessions.create(user),
+            }
         }
     }, async register(regLogin, regPassword) {
         const user = await getUser(regLogin);
@@ -33,7 +43,12 @@ export const server = {
 
 
         return {
-            error: null, result: createSession(user.role_id)
+            error: null, result: {
+                id: user.id,
+                login: user.login,
+                roleId: user.role_id,
+                session: sessions.create(user),
+            }
         }
     }
 }

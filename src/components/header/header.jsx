@@ -1,7 +1,5 @@
 import styled from "styled-components";
-import {Logo} from "./logo/logo.jsx";
-import {Links} from "./links/links.jsx";
-import {ControlPanel} from "./control-panel/control-panel.jsx";
+import {ControlPanel, Links, Logo} from './index.js'
 
 const HeaderContainer = ({className}) => {
     return (

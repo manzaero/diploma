@@ -1,2 +1,2 @@
 export * from './authorization/authorization.jsx'
-export * from './register/register.jsx'
+export * from './register/registration.jsx'

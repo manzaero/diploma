@@ -3,7 +3,7 @@ import {ACTION_TYPE} from "../action/index.js";
 
 const initialUserState = {
     id: null,
-    name: null,
+    email: null,
     login: null,
     roleId: ROLE.GUEST,
     session: null,

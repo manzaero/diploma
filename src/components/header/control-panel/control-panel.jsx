@@ -11,8 +11,9 @@ import {ROLE} from "../../../constants/index.js";
 import {logout} from "../../../action/index.js";
 
 const ControlPanelContainer = ({className}) => {
+
     const roleId = useSelector(selectUserRole)
-    const name = useSelector(selectUserName);
+    const login = useSelector(selectUserName);
     const session = useSelector(selectUserSession)
     const dispatch = useDispatch();
 
@@ -35,7 +36,7 @@ const ControlPanelContainer = ({className}) => {
             (<Link className='control-button' to='/'
                    onClick={() => dispatch(logout(session))}>
                 <img src={icons.logout} alt=""/>
-                <div>{name}</div>
+                <div>{login}</div>
             </Link>)}
     </div>)
 }

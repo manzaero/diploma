@@ -4,14 +4,20 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {server} from "../../bff/index.js";
 import {useState} from "react";
 import styled from "styled-components";
-import {Button, Input} from "../../components/index.js";
+import {AuthFromError, Button, Input} from "../../components/index.js";
 import {NavLink, useNavigate} from "react-router-dom";
 import {setUser} from "../../action/index.js";
 import {useDispatch} from "react-redux";
-import {AuthFromError} from "../../components/";
 import {useResetForm} from "../../hooks/index.js";
 
-const authFromSchema = yup.object().shape({
+
+const regFromSchema = yup.object().shape({
+    login: yup
+        .string()
+        .required("Username is required")
+        .matches(/^[a-zA-Z0-9_-]+$/, "Username is required")
+        .min(3, 'Please enter at least 3 characters')
+        .max(16, 'No more than 16 characters'),
     email: yup.string()
         .email('Invalid email address')
         .required(`Email is required`)
@@ -21,29 +27,34 @@ const authFromSchema = yup.object().shape({
         .matches(/[a-zA-Z0-9]/, 'Only letters and numbers are allowed')
         .min(4, 'Please enter at least 4 characters')
         .max(16, 'No more than 16 characters'),
+    repeatPassword: yup
+        .string()
+        .required("Password is required")
+        .oneOf([yup.ref('password'), null], 'Passwords must match')
+
 })
 
-const AuthorizationContainer = ({className}) => {
+const RegistrationContainer = ({className}) => {
     const {
         register,
         reset,
         handleSubmit,
         formState: {errors}
     } = useForm({
-        defaultValues: {email: "", password: ""},
-        resolver: yupResolver(authFromSchema),
+        defaultValues: {login: "", email: "", password: "", repeatPassword: ""},
+        resolver: yupResolver(regFromSchema),
     })
 
     const dispatch = useDispatch()
-
-    useResetForm(reset)
 
     const nav = useNavigate()
 
     const [serverError, setServerError] = useState(null)
 
-    const onSubmit = ({email, password}) => {
-        server.authorize(email, password)
+    useResetForm(reset)
+
+    const onSubmit = ({login, email, password}) => {
+        server.register(login, email, password)
             .then(({error, result}) => {
                 if (error) {
                     setServerError(`Error request: ${error}`);
@@ -55,9 +66,8 @@ const AuthorizationContainer = ({className}) => {
 
     }
 
-    const formError = errors?.email?.message || errors?.password?.message;
+    const formError = errors?.login?.message || errors?.email?.message || errors?.password?.message || errors?.repeatPassword?.message;
     const errorMessage = formError || serverError;
-
 
     return (
         <div className={className}>
@@ -72,8 +82,12 @@ const AuthorizationContainer = ({className}) => {
                     SignUp
                 </NavLink>
             </div>
-            <p>Enter your username and password to login.</p>
+            <p>Enter your email and password to register.</p>
             <form onSubmit={handleSubmit(onSubmit)}>
+                <Input type="text" placeholder="Login" name="login"
+                       id="login" {...register("login", {
+                    onChange: () => setServerError(null),
+                })}/>
                 <Input type="text" placeholder="Email address" name="email"
                        id="email" {...register("email", {
                     onChange: () => setServerError(null),
@@ -82,8 +96,12 @@ const AuthorizationContainer = ({className}) => {
                        name="password" {...register("password", {
                     onChange: () => setServerError(null),
                 })}/>
+                <Input type="password" placeholder="Password"
+                       name="password" {...register("repeatPassword", {
+                    onChange: () => setServerError(null),
+                })}/>
                 <Button type="submit" width='300' disabled={!!formError}>
-                    SignIn
+                    SingUp
                 </Button>
                 {errorMessage &&
                     <AuthFromError>{errorMessage}</AuthFromError>}
@@ -92,7 +110,7 @@ const AuthorizationContainer = ({className}) => {
     )
 }
 
-export const Authorization = styled(AuthorizationContainer)`
+export const Registration = styled(RegistrationContainer)`
     display: flex;
     align-items: center;
     flex-direction: column;

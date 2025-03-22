@@ -2,8 +2,8 @@
   "users": [
     {
       "id": "001",
-      "name": "admin",
-      "login": "admin@123.ru",
+      "login": "admin",
+      "email": "admin@123.ru",
       "password": "admin123",
       "role_id": 0
     }

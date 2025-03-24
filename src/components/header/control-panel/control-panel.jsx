@@ -8,7 +8,7 @@ import {
     selectUserSession
 } from "../../../selectors/index.js";
 import {ROLE} from "../../../constants/index.js";
-import {logout} from "../../../action/index.js";
+import {logout, setSearchProduct} from "../../../action/index.js";
 
 const ControlPanelContainer = ({className}) => {
 
@@ -17,10 +17,14 @@ const ControlPanelContainer = ({className}) => {
     const session = useSelector(selectUserSession)
     const dispatch = useDispatch();
 
+    const handleSearch = (e) => {
+        dispatch(setSearchProduct(e.target.value))
+    }
+
     return (<div className={className}>
         <div className='control-input-form'>
             <input className="control-input" type="text"
-                   placeholder="search..."/>
+                   placeholder="search..." onChange={handleSearch}/>
             <img className="control-search" src={icons.search}
                  alt="Search"/>
         </div>

@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import {Footer, Header} from "./components";
 import {Route, Routes} from "react-router-dom";
-import {Authorization, Registration} from "./pages/index.js";
+import {AdminPanel, Authorization, Registration} from "./pages/index.js";
+import {Main} from "./pages/main/main.jsx";
 
 
 const AppColumn = styled.div`
@@ -26,11 +27,11 @@ export const Shop = () => {
             <Header/>
             <Pages>
                 <Routes>
-                    <Route path="/" element={<div>Main page</div>}/>
+                    <Route path="/" element={<Main/>}/>
                     <Route path="/cart" element={<div>Product cart</div>}/>
                     <Route path="/signin" element={<Authorization/>}/>
                     <Route path="/signup" element={<Registration/>}/>
-                    <Route path="/admin" element={<div>Admin panel</div>}/>
+                    <Route path="/panel" element={<AdminPanel/>}/>
                     <Route path="*" element={<div>404</div>}/>
                 </Routes>
             </Pages>

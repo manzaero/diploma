@@ -4,6 +4,7 @@ import {
     appReducer,
     productReducer,
     productsReducer,
+    searchReducer,
     userReducer,
     usersReducer
 } from './reducers'
@@ -13,7 +14,9 @@ const reducer = combineReducers({
     user: userReducer,
     users: usersReducer,
     product: productReducer,
-    products: productsReducer
+    products: productsReducer,
+    search: searchReducer
+
 })
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 export const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)));

@@ -8,6 +8,7 @@ import {
     userReducer,
     usersReducer
 } from './reducers'
+import {categoriesReducer} from "./reducers/categories-reducer.js";
 
 const reducer = combineReducers({
     app: appReducer,
@@ -15,7 +16,8 @@ const reducer = combineReducers({
     users: usersReducer,
     product: productReducer,
     products: productsReducer,
-    search: searchReducer
+    search: searchReducer,
+    categories: categoriesReducer,
 
 })
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

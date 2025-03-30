@@ -52,5 +52,41 @@ export const server = {
                 session: sessions.create(user),
             }
         }
+    },
+    async loadProducts() {
+        try {
+            const response = await fetch('http://localhost:3005/products');
+            if (!response.ok) {
+                throw new Error(response.error);
+            }
+            const products = await response.json();
+            return {
+                error: null,
+                result: products
+            }
+        } catch (e) {
+            return {
+                error: e.message,
+                result: null
+            }
+        }
+    },
+    async loadCategories() {
+        try {
+            const response = await fetch('http://localhost:3005/categories');
+            if (!response.ok) {
+                throw new Error(response.error);
+            }
+            const categories = await response.json();
+            return {
+                error: null,
+                result: categories
+            }
+        } catch (e) {
+            return {
+                error: e.message,
+                result: null
+            }
+        }
     }
 }

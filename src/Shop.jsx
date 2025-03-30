@@ -1,7 +1,12 @@
 import styled from "styled-components";
 import {Footer, Header} from "./components";
 import {Route, Routes} from "react-router-dom";
-import {AdminPanel, Authorization, Registration} from "./pages/index.js";
+import {
+    AdminPanel,
+    Authorization,
+    Product,
+    Registration
+} from "./pages/index.js";
 import {Main} from "./pages/main/main.jsx";
 
 
@@ -28,6 +33,7 @@ export const Shop = () => {
             <Pages>
                 <Routes>
                     <Route path="/" element={<Main/>}/>
+                    <Route path="/product" element={<Product/>}/>
                     <Route path="/cart" element={<div>Product cart</div>}/>
                     <Route path="/signin" element={<Authorization/>}/>
                     <Route path="/signup" element={<Registration/>}/>

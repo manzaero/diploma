@@ -1,13 +1,23 @@
 import styled from "styled-components";
 import {useSelector} from "react-redux";
-import {selectProduct} from '../../selectors/index.js'
+import {selectProduct, selectUserRole} from '../../selectors/index.js'
 import {productImages} from "../../assets/product-image/index.js";
+import {ROLE} from "../../constants/index.js";
 
 const ProductContainer = ({className}) => {
     const product = useSelector(selectProduct)
-    const image = productImages[product.selectedProduct.image_url.replace('.png', '')]
+    const userRole = useSelector(selectUserRole)
+    const userRoleAuth = userRole !== ROLE.GUEST
 
-    console.log(product.selectedProduct)
+    if (!product || !product.selectedProduct) {
+        return <div>Product not found</div>;
+    }
+
+
+    const image = productImages[product.selectedProduct.image_url.replace('.png', '')]
+    
+
+    console.log(userRoleAuth);
     return (
         <div className={className}>
             <div className="product-img">
@@ -32,7 +42,11 @@ const ProductContainer = ({className}) => {
                             <span>1</span>
                             <button className="btn">+</button>
                         </div>
-                        <button className="buy-btn">Add to cart</button>
+                        {userRoleAuth ?
+                            (<button className="buy-btn">Add to cart
+                            </button>) :
+                            (<p>Please log in to add to cart</p>)
+                        }
                     </div>
                 </div>
             </div>
@@ -71,6 +85,11 @@ export const Product = styled(ProductContainer)`
 
     .title-description {
         margin: 16px 0 0 0;
+
+        p {
+            font-size: 16px;
+            padding-left: 20px;
+        }
     }
 
     .description-title {

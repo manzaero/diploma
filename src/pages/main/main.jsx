@@ -24,32 +24,9 @@ const MainContainer = ({className}) => {
     const searchProduct = useSelector(selectSearchProduct);
     const setCategory = useSelector(selectCategory);
     const [sortToggled, setSortToggle] = useState('reset');
-    // const categories = [
-    //     {
-    //         id: 1,
-    //         name: "House Plants",
-    //         category: "house_plants"
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "Potter Plants",
-    //         category: "potter_plants"
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "Seeds",
-    //         category: "seeds"
-    //     },
-    //     {
-    //         id: 4,
-    //         name: "Succulents",
-    //         category: "succulents"
-    //     }
-    // ]
     const products = useSelector(selectLoadProducts);
     const categories = useSelector(selectCategories);
     const productCount = countProductsByCategory(products)
-    console.log('categories', categories)
     useEffect(() => {
         server.loadProducts().then(({error, result}) => {
             if (error) {
@@ -74,9 +51,6 @@ const MainContainer = ({className}) => {
             }
         })
     }, [dispatch]);
-
-
-    console.log(products);
 
     const filteredProducts = Array.isArray(products) ? products.filter(product => {
         return (

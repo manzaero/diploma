@@ -6,7 +6,7 @@ import {useState} from "react";
 import styled from "styled-components";
 import {AuthFromError, Button, Input} from "../../components/index.js";
 import {NavLink, useNavigate} from "react-router-dom";
-import {setUser} from "../../action/index.js";
+import {ACTION_TYPE, setUser} from "../../action/index.js";
 import {useDispatch} from "react-redux";
 import {useResetForm} from "../../hooks/index.js";
 
@@ -54,6 +54,7 @@ const RegistrationContainer = ({className}) => {
     useResetForm(reset)
 
     const onSubmit = ({login, email, password}) => {
+        dispatch({type: ACTION_TYPE.CLEAR_CART})
         server.register(login, email, password)
             .then(({error, result}) => {
                 if (error) {

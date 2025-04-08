@@ -1,7 +1,7 @@
 import {ACTION_TYPE} from "../action/index.js";
 
 const initialProductState = {
-    selectedProduct: null,
+    selectedProduct: [],
 }
 
 export const productReducer = (state = initialProductState, action) => {

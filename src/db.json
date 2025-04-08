@@ -1,49 +1,56 @@
 {
   "users": [
     {
-      "id": "001",
+      "id": "2255",
+      "login": "manza",
+      "email": "manza@mail.ru",
+      "password": "manza123",
+      "role_id": 2
+    },
+    {
+      "id": "ad34",
       "login": "admin",
-      "email": "admin@123.ru",
+      "email": "admin@mail.ru",
       "password": "admin123",
       "role_id": 0
     }
   ],
   "roles": [
     {
-      "id": 0,
+      "id": "0",
       "name": "Administrator"
     },
     {
-      "id": 1,
+      "id": "1",
       "name": "Moderator"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Client"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Reader"
     }
   ],
   "categories": [
     {
-      "id": 1,
+      "id": "1",
       "name": "House Plants",
       "category": "house_plants"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Potter Plants",
       "category": "potter_plants"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Seeds",
       "category": "seeds"
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Succulents",
       "category": "succulents"
     }
@@ -113,5 +120,16 @@
       "category": "house_plants"
     }
   ],
-  "comments": []
+  "cart": [
+    {
+      "id": "2255",
+      "items": [],
+      "sum": 0
+    },
+    {
+      "id": "ad34",
+      "items": [],
+      "sum": 0
+    }
+  ]
 }

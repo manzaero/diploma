@@ -1,8 +1,17 @@
 import styled from "styled-components";
+import {useDispatch} from "react-redux";
 
-const ButtonContainer = ({className, children, width, ...props}) => {
+const ButtonContainer = ({className, onClick, children, width, ...props}) => {
+    const dispatch = useDispatch();
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick(dispatch)
+        }
+    }
+
     return (
-        <button className={className} {...props}>
+        <button className={className} onClick={handleClick} {...props}>
             {children}
         </button>
     )
@@ -11,6 +20,7 @@ export const Button = styled(ButtonContainer)`
     width: ${({width = '100%'}) => width}px;
     min-height: 45px;
     padding-left: 14px;
+    margin: 4px 0;
     background: #46A358;
     border-radius: 5px;
     border: none;

@@ -3,15 +3,17 @@ import {Link} from "react-router-dom";
 import {icons} from "../../../assets/icon/index.js"
 import {useDispatch, useSelector} from "react-redux";
 import {
+    selectCart,
     selectUserName,
     selectUserRole,
     selectUserSession
 } from "../../../selectors/index.js";
 import {ROLE} from "../../../constants/index.js";
 import {logout, setSearchProduct} from "../../../action/index.js";
+import {useUserRole} from "../../../constants/use-user-role.js";
 
 const ControlPanelContainer = ({className}) => {
-
+    const cart = useSelector(selectCart)
     const roleId = useSelector(selectUserRole)
     const login = useSelector(selectUserName);
     const session = useSelector(selectUserSession)
@@ -28,10 +30,10 @@ const ControlPanelContainer = ({className}) => {
             <img className="control-search" src={icons.search}
                  alt="Search"/>
         </div>
-        <Link className='control-cart' to='/cart'>
+        {useUserRole() && <Link className='control-cart' to='/cart'>
             <img src={icons.cart} alt="cart"/>
-            <div>{6}</div>
-        </Link>
+            <div>{cart.length}</div>
+        </Link>}
         {roleId === ROLE.GUEST ?
             (<Link className="control-button" to='/signin'>
                 <img src={icons.logout} alt=""/>

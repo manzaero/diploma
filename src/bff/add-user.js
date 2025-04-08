@@ -1,7 +1,9 @@
 import {generateDate} from "./generate-date.js";
 
-export const addUser = async (login, email, password) =>
-    fetch('http://localhost:3005/users', {
+export const addUser = async (login, email, password) => {
+    localStorage.removeItem('cart')
+
+    const res = await fetch('http://localhost:3005/users', {
         method: 'POST', headers: {
             'Content-Type': 'application/json; charset=utf-8'
         }, body: JSON.stringify({
@@ -12,4 +14,20 @@ export const addUser = async (login, email, password) =>
             role_id: 2
         })
     })
-        .then((createdUser) => createdUser.json())
+
+    const newUser = await res.json()
+
+    console.log(newUser)
+
+    await fetch('http://localhost:3005/cart', {
+        method: 'POST', headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify({
+            id: newUser.id,
+            items: [],
+            sum: 0
+        })
+    })
+    return newUser
+}

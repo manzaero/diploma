@@ -2,6 +2,7 @@ import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import {thunk} from "redux-thunk";
 import {
     appReducer,
+    cartReducer,
     categoriesReducer,
     productReducer,
     productsReducer,
@@ -9,6 +10,8 @@ import {
     userReducer,
     usersReducer
 } from './reducers'
+import {sendCartToServer} from "./bff/cart.js";
+import {logout} from "./action/index.js";
 
 const loadingState = () => {
     const realizingState = localStorage.getItem('initialUsersState');
@@ -28,12 +31,25 @@ const reducer = combineReducers({
     products: productsReducer,
     search: searchReducer,
     categories: categoriesReducer,
+    cart: cartReducer
 
 })
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export const store = createStore(reducer, loadingState(), composeEnhancers(applyMiddleware(thunk)));
 
+let prevState = null;
+
 store.subscribe(() => {
-    saveState(store.getState())
+    const state = store.getState();
+    saveState(state)
+
+    const cart = state.cart
+    const userId = state.user?.id
+
+    if (userId && JSON.stringify(prevState) !== JSON.stringify(cart)) {
+        sendCartToServer(userId, cart)
+            .then(res => logout(res))
+        prevState = cart
+    }
 })

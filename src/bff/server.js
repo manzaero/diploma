@@ -31,6 +31,7 @@ export const server = {
             }
         }
     }, async register(regLogin, regEmail, regPassword) {
+        localStorage.removeItem("cart");
         const existedUser = await getUser(regEmail);
 
         if (existedUser) {

@@ -89,25 +89,27 @@ const MainContainer = ({className}) => {
     return (
         <div className={className}>
 
-            <div className="main-categories">
-                <p>Categories</p>
-                <ul>
-                    {errorLoadCategories ? (
-                            <div>{errorLoadCategories}</div>
-                        ) :
-                        categories.map((item) => (
-                            <li className="active" key={item.id}
-                                onClick={() => handleCategories(item.category)}>
-                                <span>{item.name}</span>
-                                <span>{productCount[item.category] || 0}</span>
-                            </li>
-                        ))}
-                    <li className="active"
-                        onClick={() => dispatch(setCategories(null))}>
-                        <span>All categories</span>
-                    </li>
-                </ul>
-            </div>
+            {errorLoadCategories ? null :
+                (<div className="main-categories">
+                    <p>Categories</p>
+                    <ul>
+                        {errorLoadCategories ? (
+                                <div>{errorLoadCategories}</div>
+                            ) :
+                            categories.map((item) => (
+                                <li className="active" key={item.id}
+                                    onClick={() => handleCategories(item.category)}>
+                                    <span>{item.name}</span>
+                                    <span>{productCount[item.category] || 0}</span>
+                                </li>
+                            ))}
+                        <li className="active"
+                            onClick={() => dispatch(setCategories(null))}>
+                            <span>All categories</span>
+                        </li>
+                    </ul>
+                </div>)
+            }
             {errorLoadProducts ? (
                 <div>{errorLoadProducts}</div>
             ) : sortedProducts.length === 0 ? (<Loader/>) : (

@@ -1,10 +1,57 @@
 import styled from "styled-components";
-import {Title} from "../../components/index.js";
+import {Button, Title} from "../../components/index.js";
+import {useEffect, useState} from "react";
+import {server} from "../../bff/index.js";
+import {loadCategories, loadProducts} from "../../action/index.js";
+import {useDispatch, useSelector} from "react-redux";
+import {selectCategories, selectLoadProducts} from "../../selectors/index.js";
 import {productImages} from "../../assets/product-image/index.js";
 import {icons} from "../../assets/icon/index.js";
 
 
 const AdminPanelContainer = ({className}) => {
+    const [errorLoadProducts, setErrorLoadProducts] = useState(null);
+    const [errorLoadCategory, setErrorLoadCategory] = useState(null);
+    const dispatch = useDispatch();
+    const products = useSelector(selectLoadProducts)
+    const categories = useSelector(selectCategories);
+    const [changeProduct, setChangeProduct] = useState({});
+    console.log(products)
+    useEffect(() => {
+        server.loadProducts().then(({error, result}) => {
+            if (error) {
+                setErrorLoadProducts(`Product loading error: ${error}`);
+                return;
+            }
+            if (Array.isArray(result)) {
+                dispatch(loadProducts(result));
+            } else {
+                console.error("Unexpected data structure:", result);
+            }
+        });
+        server.loadCategories().then(({error, result}) => {
+            if (error) {
+                setErrorLoadCategory('error load products')
+                return
+            }
+            if (Array.isArray(result)) {
+                dispatch(loadCategories(result));
+            } else {
+                console.error("Unexpected category structure:", result);
+            }
+        })
+    }, [dispatch])
+
+    const handleChange = (id, field, value) => {
+        setChangeProduct(prev => ({
+            ...prev,
+            [id]: {
+                ...products.find(p => p.id === id),
+                ...prev[id],
+                [field]: value
+            }
+        }))
+    }
     return (
         <div className={className}>
             <Title>{"Admin panel"}</Title>
@@ -20,82 +67,89 @@ const AdminPanelContainer = ({className}) => {
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        <div className="product-info">
-                            <img src={productImages.barbertonDaisy}
-                                 alt="Barberton Daisy"/>
-                            <div>
-                                <p className="product-name">Barberton Daisy</p>
-                                <p className="sku">SKU: 1995751877966</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>$119.00</td>
-                    <td>
-                        <div className="quantity-control">
-                            <button>-</button>
-                            <span>2</span>
-                            <button>+</button>
-                        </div>
-                    </td>
-                    <td className="total">$238.00</td>
-                    <td>
-                        <button className="delete-btn"><img src={icons.delete}
-                                                            alt=""/></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div className="product-info">
-                            <img src={productImages.africanViolet}
-                                 alt="Blushing Bromeliad"/>
-                            <div>
-                                <p className="product-name">Blushing
-                                    Bromeliad</p>
-                                <p className="sku">SKU: 19957518757065</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>$139.00</td>
-                    <td>
-                        <div className="quantity-control">
-                            <button>-</button>
-                            <span>6</span>
-                            <button>+</button>
-                        </div>
-                    </td>
-                    <td className="total">$834.00</td>
-                    <td>
-                        <button className="delete-btn"><img src={icons.delete}
-                                                            alt=""/></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div className="product-info">
-                            <img src={productImages.aluminumPlant}
-                                 alt="Aluminum Plant"/>
-                            <div>
-                                <p className="product-name">Aluminum Plant</p>
-                                <p className="sku">SKU: 1995751877786</p>
-                            </div>
-                        </div>
-                    </td>
-                    <td>$179.00</td>
-                    <td>
-                        <div className="quantity-control">
-                            <button>-</button>
-                            <span>9</span>
-                            <button>+</button>
-                        </div>
-                    </td>
-                    <td className="total">$1,611.00</td>
-                    <td>
-                        <button className="delete-btn"><img src={icons.delete}
-                                                            alt=""/></button>
-                    </td>
-                </tr>
+                {
+                    errorLoadProducts ? (
+                        <div>Error loading or products not found</div>
+                    ) : (
+                        products.map((item) => {
+                            const current = changeProduct[item.id] || item;
+                            return (<tr key={item.id}>
+                                <td>
+                                    <div className="product-info">
+                                        <img
+                                            src={productImages[current.image_url.replace('.png', '')]}
+                                            alt="item.name"/>
+                                        <div>
+                                            <input
+                                                value={current.name}
+                                                onChange={e => handleChange(item.id, "name", e.target.value)}
+                                            />
+                                            <p className="sku">
+                                                <span>Category:</span>
+                                                <select
+                                                    value={current.category}
+                                                    onChange={e => handleChange(item.id, "category", e.target.value)}
+                                                >
+                                                    {!errorLoadCategory ?
+                                                        categories.map((category) => (
+                                                            <option
+                                                                key={category.id}
+                                                                value={category.category}>
+                                                                {category.name}
+                                                            </option>
+                                                        )) : errorLoadCategory
+                                                    }
+                                                </select>
+                                            </p>
+                                            <p className="sku">
+                                                <span>Image</span>:
+                                                <select
+                                                    value={current.image_url}
+                                                    onChange={e => handleChange(item.id, "image_url", e.target.value)}
+                                                >
+                                                    {Object.keys(productImages).map((imgKey) => (
+                                                        <option key={imgKey}
+                                                                value={`${imgKey}.png`}>
+                                                            {imgKey}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input value={current.price}
+                                           onChange={e => handleChange(item.id, "price", +e.target.value)}
+                                    />
+                                </td>
+                                <td>
+                                    <div className="quantity-control">
+                                        <button
+                                            onClick={() => handleChange(item.id, "count", Math.max(current.count - 1, 0))}>-
+                                        </button>
+                                        <span>{current.count}</span>
+                                        <button
+                                            onClick={() => handleChange(item.id, "count", current.count + 1)}>+
+                                        </button>
+                                    </div>
+                                </td>
+                                <td className="total">${current.price * current.count}.00</td>
+                                <td className="btn-save">
+                                    <Button children={"Save"}
+                                            width={"90"}
+                                            onClick={() => sendToServerChangedProduct(current.id, current)}
+                                    />
+                                    <div className="delete-btn">
+                                        <button><img
+                                            src={icons.delete}
+                                            alt=""/></button>
+                                    </div>
+                                </td>
+                            </tr>)
+                        })
+                    )
+                }
                 </tbody>
             </table>
 
@@ -109,9 +163,53 @@ export const AdminPanel = styled(AdminPanelContainer)`
         border-collapse: collapse;
     }
 
+    select {
+        width: 100%;
+        padding: 4px 20px;
+    }
+
+    input {
+        appearance: none;
+        border: 0;
+        outline: 0;
+        font: inherit;
+        width: 15rem;
+        height: 20px;
+        padding: 1rem 4rem 1rem 1rem;
+        background: var(--arrow-icon) no-repeat right 0.8em center / 1.4em,
+        linear-gradient(to left, var(--arrow-bg) 3em, var(--select-bg) 3em);
+        color: #46A358;
+        border-radius: 0.5em;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+
+        &::-ms-expand {
+            display: none;
+        }
+
+        &:hover {
+            background: var(--arrow-icon) no-repeat right 0.8em center / 1.4em,
+            linear-gradient(to left, var(--arrow-bg) 3em, var(--hover-bg) 3em);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--focus-shadow);
+            transform: scale(1.02);
+        }
+
+        option {
+            color: inherit;
+            background-color: var(--option-bg);
+        }
+    }
+
     .cart-table th,
     .cart-table td {
-        padding: 12px;
+        padding: 5px;
+        margin-bottom: -1px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
@@ -135,6 +233,11 @@ export const AdminPanel = styled(AdminPanelContainer)`
     .sku {
         font-size: 12px;
         color: gray;
+        display: flex;
+
+        span {
+            font-weight: 600;
+        }
     }
 
     .quantity-control {
@@ -160,15 +263,24 @@ export const AdminPanel = styled(AdminPanelContainer)`
     }
 
     .delete-btn {
-        background: none;
-        border: none;
-        font-size: 18px;
-        cursor: pointer;
-        color: gray;
+        button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: gray;
+            margin: 5px 0 0 5px;
+        }
     }
 
     .delete-btn:hover {
         color: red;
     }
 
+    .btn-save {
+        display: flex;
+        height: 106px;
+        align-items: center;
+        justify-content: space-evenly;
+    }
 `

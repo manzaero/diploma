@@ -19,7 +19,7 @@ const ButtonContainer = ({className, onClick, children, width, ...props}) => {
 export const Button = styled(ButtonContainer)`
     width: ${({width = '100%'}) => width}px;
     min-height: 45px;
-    padding-left: 14px;
+    padding-left: 10px;
     margin: 4px 0;
     background: #46A358;
     border-radius: 5px;

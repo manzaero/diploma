@@ -8,9 +8,8 @@ import {
     selectUserRole,
     selectUserSession
 } from "../../../selectors/index.js";
-import {ROLE} from "../../../constants/index.js";
+import {ROLE, useUserRole} from "../../../constants/index.js";
 import {logout, setSearchProduct} from "../../../action/index.js";
-import {useUserRole} from "../../../constants/use-user-role.js";
 
 const ControlPanelContainer = ({className}) => {
     const cart = useSelector(selectCart)
@@ -30,10 +29,11 @@ const ControlPanelContainer = ({className}) => {
             <img className="control-search" src={icons.search}
                  alt="Search"/>
         </div>
-        {useUserRole() && <Link className='control-cart' to='/cart'>
-            <img src={icons.cart} alt="cart"/>
-            <div>{cart.length}</div>
-        </Link>}
+        {roleId === 0 ? null : useUserRole &&
+            <Link className='control-cart' to='/cart'>
+                <img src={icons.cart} alt="cart"/>
+                <div>{cart.length}</div>
+            </Link>}
         {roleId === ROLE.GUEST ?
             (<Link className="control-button" to='/signin'>
                 <img src={icons.logout} alt=""/>

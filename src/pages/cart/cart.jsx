@@ -32,7 +32,7 @@ const CartContainer = ({className}) => {
         console.log(id)
     }
 
-    const decrementProduct = (id) => {
+    const incrementProductCount = (id) => {
         dispatch(incrementFromCart(id))
     }
 
@@ -70,7 +70,7 @@ const CartContainer = ({className}) => {
                                     <span
                                         className="quantity">{item.quantity}</span>
                                     <button className="quantity-btn"
-                                            onClick={() => decrementProduct(item.id)}>+
+                                            onClick={() => incrementProductCount(item.id)}>+
                                     </button>
                                 </td>
                                 <td className="total-price">${item.price * item.quantity}.00</td>

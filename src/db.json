@@ -58,11 +58,11 @@
   "products": [
     {
       "id": "001",
-      "name": "Barberton Daisy",
+      "name": "Barberton Daisys",
       "image_url": "barbertonDaisy.png",
       "product_description": "The ceramic cylinder planters come with a wooden stand to help elevate your plants off the ground. The ceramic cylinder planters come with a wooden stand to help elevate your plants off the ground. ",
-      "count": 13,
-      "price": 119,
+      "count": 17,
+      "price": 118,
       "category": "house_plants"
     },
     {

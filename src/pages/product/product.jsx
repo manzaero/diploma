@@ -7,6 +7,14 @@ import {useUserRole} from "../../constants/index.js";
 
 const ProductContainer = ({className}) => {
     const product = useSelector(selectProduct)
+    if (
+        !product ||
+        !product.selectedProduct ||
+        Array.isArray(product.selectedProduct) ||
+        !product.selectedProduct.image_url
+    ) {
+        return <div>Product not found</div>;
+    }
     const image = productImages[product.selectedProduct.image_url.replace('.png', '')]
     const dispatch = useDispatch();
     const userRole = useUserRole()
@@ -19,10 +27,6 @@ const ProductContainer = ({className}) => {
             price: product.selectedProduct.price,
             image_url: product.selectedProduct.image_url.replace('.png', '')
         }))
-    }
-
-    if (!product || !product.selectedProduct) {
-        return <div>Product not found</div>;
     }
 
 
@@ -127,7 +131,7 @@ export const Product = styled(ProductContainer)`
         align-items: center;
     }
 
-    
+
     span {
         padding: 0 20px;
         font-size: 20px;

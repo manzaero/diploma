@@ -2,7 +2,7 @@ import styled from "styled-components";
 import {Button, Title} from "../../components/index.js";
 import {useEffect, useState} from "react";
 import {server} from "../../bff/index.js";
-import {loadCategories, loadProducts} from "../../action/index.js";
+import {addProduct, loadCategories, loadProducts} from "../../action/index.js";
 import {useDispatch, useSelector} from "react-redux";
 import {selectCategories, selectLoadProducts} from "../../selectors/index.js";
 import {productImages} from "../../assets/product-image/index.js";
@@ -16,31 +16,15 @@ const AdminPanelContainer = ({className}) => {
     const products = useSelector(selectLoadProducts)
     const categories = useSelector(selectCategories);
     const [changeProduct, setChangeProduct] = useState({});
+    const [newProduct, setNewProduct] = useState({
+        name: '',
+        category: '',
+        image_url: '',
+        price: "",
+        count: "",
+        product_description: ''
+    });
     console.log(products)
-    useEffect(() => {
-        server.loadProducts().then(({error, result}) => {
-            if (error) {
-                setErrorLoadProducts(`Product loading error: ${error}`);
-                return;
-            }
-            if (Array.isArray(result)) {
-                dispatch(loadProducts(result));
-            } else {
-                console.error("Unexpected data structure:", result);
-            }
-        });
-        server.loadCategories().then(({error, result}) => {
-            if (error) {
-                setErrorLoadCategory('error load products')
-                return
-            }
-            if (Array.isArray(result)) {
-                dispatch(loadCategories(result));
-            } else {
-                console.error("Unexpected category structure:", result);
-            }
-        })
-    }, [dispatch])
 
     const handleChange = (id, field, value) => {
         setChangeProduct(prev => ({
@@ -52,9 +36,153 @@ const AdminPanelContainer = ({className}) => {
             }
         }))
     }
+
+    const handleSave = async (id) => {
+        const updatedProduct = changeProduct[id]
+        if (!updatedProduct) {
+            return;
+        }
+        const {error} = await server.changeProduct(id, updatedProduct)
+        if (error) {
+            console.log("error saving product", error)
+        } else {
+            console.log("product saving success")
+        }
+    }
+
+    const handleProductChange = (field, value) => {
+        setNewProduct(prev => ({
+            ...prev,
+            [field]: value
+        }))
+    }
+
+    const handleAddProduct = async (e) => {
+        e.preventDefault();
+        const {
+            name,
+            category,
+            image_url,
+            price,
+            count,
+            product_description
+        } = newProduct
+        if (!name || !category || !image_url || !price || !count || !
+            product_description) {
+            console.log('not data fields')
+            return
+        }
+        const newItem = {
+            ...newProduct,
+            price: +price,
+            count: +count
+        }
+        console.log(newItem)
+        const {error, result} = await server.addProduct(newItem)
+
+        if (error) {
+            console.log('err add product')
+        } else if (result && result.id) {
+            console.log(newProduct)
+            dispatch(addProduct(result))
+        } else {
+            console.log('adding prod', result)
+        }
+
+        setNewProduct({
+            name: '',
+            category: '',
+            image_url: '',
+            price: '',
+            count: '',
+            product_description: ''
+        })
+    }
+
+
+    useEffect(() => {
+        server.loadProducts().then(({error, result}) => {
+            if (error) {
+                setErrorLoadProducts(`product loading error: ${error}`);
+                return;
+            }
+            if (Array.isArray(result)) {
+                dispatch(loadProducts(result));
+            } else {
+                console.error("data structure:", result);
+            }
+        });
+        server.loadCategories().then(({error, result}) => {
+            if (error) {
+                setErrorLoadCategory('error load products')
+                return
+            }
+            if (Array.isArray(result)) {
+                dispatch(loadCategories(result));
+            } else {
+                console.error("category structure:", result);
+            }
+        })
+    }, [dispatch])
+
+    const handleDeleteProduct = async (id) => {
+        const {error} = await server.deleteProduct(id);
+        if (error) {
+            console.log(error)
+            return
+        } else {
+            console.log('deleting successfully')
+            dispatch(loadProducts(products.filter(p => p.id !== id)))
+        }
+
+    }
+
+
     return (
         <div className={className}>
             <Title>{"Admin panel"}</Title>
+
+            <form action="" onSubmit={handleAddProduct}
+                  className="add-product-form">
+                <input type="text"
+                       value={newProduct.name}
+                       placeholder="Product name"
+                       onChange={e => handleProductChange("name", e.target.value)}
+                />
+                <select
+                    value={newProduct.category}
+                    onChange={e => handleProductChange("category", e.target.value)}
+                >
+                    <option value="">Select category</option>
+                    {categories.map(cat => (
+                        <option key={cat.id} value={cat.category}>
+                            {cat.name}
+                        </option>
+                    ))}
+                </select>
+                <input type="text"
+                       value={newProduct.image_url}
+                       placeholder="Product image"
+                       onChange={e => handleProductChange("image_url", e.target.value)}
+                />
+                <input type="text"
+                       value={newProduct.price}
+                       placeholder="Product price"
+                       onChange={e => handleProductChange("price", e.target.value)}
+                />
+                <input type="text"
+                       value={newProduct.product_description}
+                       placeholder="Product description"
+                       className='description_input'
+                       onChange={e => handleProductChange("product_description", e.target.value)}
+                />
+                <input type="text"
+                       value={newProduct.count}
+                       placeholder="Product count"
+                       onChange={e => handleProductChange("count", e.target.value)}
+                />
+                <Button width={"240"} type="submit">{"Create"}</Button>
+            </form>
 
             <table className="cart-table">
                 <thead>
@@ -138,12 +266,14 @@ const AdminPanelContainer = ({className}) => {
                                 <td className="btn-save">
                                     <Button children={"Save"}
                                             width={"90"}
-                                            onClick={() => sendToServerChangedProduct(current.id, current)}
+                                            onClick={() => handleSave(current.id)}
                                     />
                                     <div className="delete-btn">
-                                        <button><img
-                                            src={icons.delete}
-                                            alt=""/></button>
+                                        <button
+                                            onClick={() => handleDeleteProduct(item.id)}>
+                                            <img
+                                                src={icons.delete}
+                                                alt=""/></button>
                                     </div>
                                 </td>
                             </tr>)
@@ -279,8 +409,27 @@ export const AdminPanel = styled(AdminPanelContainer)`
 
     .btn-save {
         display: flex;
-        height: 106px;
+        height: 138px;
         align-items: center;
         justify-content: space-evenly;
     }
+
+    .add-product-form {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 1px;
+        margin-bottom: 24px;
+
+        select {
+            width: 240px;
+            height: 45px;
+        }
+    }
+
+    input {
+        height: 45px;
+    }
+
+
 `

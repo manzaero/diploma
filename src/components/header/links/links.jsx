@@ -6,7 +6,6 @@ import {ROLE} from "../../../constants/index.js";
 
 const LinksContainer = ({className}) => {
     const userRole = useSelector(selectUserRole);
-    console.log(userRole)
 
     return (
         <div className={className}>

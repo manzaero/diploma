@@ -1,8 +1,13 @@
-import {getUser} from "./get-user.js";
-import {addUser} from "./add-user.js";
 import {sessions} from "./sessions.js";
-import {createProduct} from "./create-product.js";
-import {deleteProduct} from "./deleteProduct.js";
+import {
+    addUser,
+    createProduct,
+    deleteProduct,
+    getCategories,
+    getProducts,
+    getUser,
+    mixProduct
+} from "./api/input.js";
 
 
 export const server = {
@@ -59,47 +64,38 @@ export const server = {
     async loadProducts() {
         try {
             const savedProducts = localStorage.getItem("products");
+
             if (savedProducts) {
                 try {
                     const parsed = JSON.parse(savedProducts);
                     return {
                         error: null,
                         result: parsed
-                    }
+                    };
                 } catch (parseError) {
-                    console.warn("Ошибка парсинга localStorage, гружу с" +
-                        " сервака", parseError);
-                    localStorage.removeItem("products"); // на всякий случай очищаем битые данные
+                    console.warn("Ошибка парсинга localStorage, гружу с сервака", parseError);
+                    localStorage.removeItem("products");
                 }
             }
 
-            const response = await fetch('http://localhost:3005/products');
-            if (!response.ok) {
-                throw new Error(response.statusText || "Ошибка при загрузке");
-            }
-            const products = await response.json();
+            const products = await getProducts();
 
-            // 3. Сохраняем в localStorage
             localStorage.setItem("products", JSON.stringify(products));
 
             return {
                 error: null,
                 result: products
-            }
+            };
         } catch (e) {
             return {
                 error: e.message,
                 result: null
-            }
+            };
         }
     },
     async loadCategories() {
         try {
-            const response = await fetch('http://localhost:3005/categories');
-            if (!response.ok) {
-                throw new Error(response.error);
-            }
-            const categories = await response.json();
+            const categories = await getCategories();
             return {
                 error: null,
                 result: categories
@@ -112,18 +108,9 @@ export const server = {
         }
     },
     async changeProduct(id, data) {
+        localStorage.removeItem("products");
         try {
-            const response = fetch(`http://localhost:3005/products/${id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8'
-                },
-                body: JSON.stringify(data)
-            })
-            if (!response.ok) {
-                throw new Error(response.error);
-            }
-            const updateProduct = await response.json();
+            const updateProduct = await mixProduct(id, data)
             return {
                 error: null,
                 result: updateProduct
@@ -136,6 +123,7 @@ export const server = {
         }
     },
     async addProduct(product) {
+        localStorage.removeItem("products");
         try {
             const res = await createProduct(product)
 
@@ -159,7 +147,8 @@ export const server = {
             }
         }
     },
-    async deleteProduct(id) {
+    async removeProduct(id) {
+        localStorage.removeItem("products");
         try {
             const res = await deleteProduct(id);
             if (!res.ok) {

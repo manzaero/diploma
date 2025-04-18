@@ -1,4 +1,4 @@
-import {clearCart} from "../action/index.js";
+import {clearCart} from "../../action/index.js";
 
 export const checkoutCart = () => async (dispatch, getState) => {
     const {cart, user} = getState()

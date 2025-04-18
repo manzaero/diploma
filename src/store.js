@@ -10,7 +10,7 @@ import {
     userReducer,
     usersReducer
 } from './reducers'
-import {sendCartToServer} from "./bff/cart.js";
+import {sendCartToServer} from "./bff/api/input.js";
 import {logout} from "./action/index.js";
 
 const loadingState = () => {

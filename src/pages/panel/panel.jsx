@@ -126,7 +126,7 @@ const AdminPanelContainer = ({className}) => {
     }, [dispatch])
 
     const handleDeleteProduct = async (id) => {
-        const {error} = await server.deleteProduct(id);
+        const {error} = await server.removeProduct(id);
         if (error) {
             console.log(error)
             return
@@ -136,7 +136,6 @@ const AdminPanelContainer = ({className}) => {
         }
 
     }
-
 
     return (
         <div className={className}>

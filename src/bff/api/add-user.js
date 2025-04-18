@@ -1,4 +1,4 @@
-import {generateDate} from "./generate-date.js";
+import {generateDate} from "../generate-date.js";
 
 export const addUser = async (login, email, password) => {
     localStorage.removeItem('cart')
@@ -17,7 +17,6 @@ export const addUser = async (login, email, password) => {
 
     const newUser = await res.json()
 
-    console.log(newUser)
 
     await fetch('http://localhost:3005/cart', {
         method: 'POST', headers: {

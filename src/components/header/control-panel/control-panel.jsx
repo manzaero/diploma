@@ -10,6 +10,8 @@ import {
 } from "../../../selectors/index.js";
 import {ROLE, useUserRole} from "../../../constants/index.js";
 import {logout, setSearchProduct} from "../../../action/index.js";
+import {useDebounceInput} from "../../../hooks/index.js";
+import {Input} from "../../input/input.jsx";
 
 const ControlPanelContainer = ({className}) => {
     const cart = useSelector(selectCart)
@@ -18,14 +20,15 @@ const ControlPanelContainer = ({className}) => {
     const session = useSelector(selectUserSession)
     const dispatch = useDispatch();
 
-    const handleSearch = (e) => {
-        dispatch(setSearchProduct(e.target.value))
-    }
+    const {value, onChange} = useDebounceInput((e) => {
+        dispatch(setSearchProduct(e))
+    }, 500)
 
     return (<div className={className}>
         <div className='control-input-form'>
-            <input className="control-input" type="text"
-                   placeholder="search..." onChange={handleSearch}/>
+            <Input className="control-input" type="text"
+                   value={value}
+                   placeholder="search..." onChange={onChange}/>
             <img className="control-search" src={icons.search}
                  alt="Search"/>
         </div>

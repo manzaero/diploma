@@ -27,6 +27,7 @@ const MainContainer = ({className}) => {
     const products = useSelector(selectLoadProducts);
     const categories = useSelector(selectCategories);
     const productCount = countProductsByCategory(products)
+
     useEffect(() => {
         server.loadProducts().then(({error, result}) => {
             if (error) {

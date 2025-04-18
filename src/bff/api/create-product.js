@@ -1,4 +1,4 @@
-import {generateDate} from "./generate-date.js";
+import {generateDate} from "../generate-date.js";
 
 export const createProduct = async (product) => {
     const res = await fetch(`http://localhost:3005/products/`, {

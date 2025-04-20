@@ -20,6 +20,8 @@ const ControlPanelContainer = ({className}) => {
     const session = useSelector(selectUserSession)
     const dispatch = useDispatch();
 
+    console.log(roleId)
+
     const {value, onChange} = useDebounceInput((e) => {
         dispatch(setSearchProduct(e))
     }, 500)
@@ -32,7 +34,7 @@ const ControlPanelContainer = ({className}) => {
             <img className="control-search" src={icons.search}
                  alt="Search"/>
         </div>
-        {roleId === 0 ? null : useUserRole &&
+        {roleId === 3 ? null : useUserRole &&
             <Link className='control-cart' to='/cart'>
                 <img src={icons.cart} alt="cart"/>
                 <div>{cart.length}</div>

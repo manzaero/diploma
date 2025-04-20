@@ -10,18 +10,12 @@ import {
 } from "../../action/index.js";
 import {productImages} from "../../assets/product-image/index.js";
 import {icons} from "../../assets/icon/index.js";
-import {selectUserId} from "../../selectors/select-user-id.js";
 
 
 const CartContainer = ({className}) => {
     const dispatch = useDispatch();
     const cart = useSelector(selectCart);
-    const userId = useSelector(selectUserId);
     const sum = useSelector(selectorCartSum);
-
-    console.log(sum)
-    console.log(cart)
-    console.log(userId)
 
     const handleClick = () => {
         dispatch(clearCart())

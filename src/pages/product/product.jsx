@@ -7,6 +7,8 @@ import {useUserRole} from "../../constants/index.js";
 
 const ProductContainer = ({className}) => {
     const product = useSelector(selectProduct)
+    const dispatch = useDispatch();
+    const userRole = useUserRole()
     if (
         !product ||
         !product.selectedProduct ||
@@ -16,8 +18,7 @@ const ProductContainer = ({className}) => {
         return <div>Product not found</div>;
     }
     const image = productImages[product.selectedProduct.image_url.replace('.png', '')]
-    const dispatch = useDispatch();
-    const userRole = useUserRole()
+
     console.log(product)
 
     const addProductToCart = () => {

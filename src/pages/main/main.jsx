@@ -6,18 +6,12 @@ import {
     selectLoadProducts,
     selectSearchProduct
 } from "../../selectors/index.js";
-import {
-    loadCategories,
-    loadProducts,
-    selectProduct,
-    setCategories
-} from "../../action/index.js";
+import {setCategories} from "../../action/index.js";
 import {Loader} from "../../components/index.js";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Link} from "react-router-dom";
-import {server} from "../../bff/index.js";
 import {productImages} from '../../assets/product-image/index.js'
-import {countProductsByCategory} from "../../hooks/index.js";
+import {countProductsByCategory, useLoadData} from "../../hooks/index.js";
 
 const MainContainer = ({className}) => {
     const dispatch = useDispatch();
@@ -27,31 +21,9 @@ const MainContainer = ({className}) => {
     const products = useSelector(selectLoadProducts);
     const categories = useSelector(selectCategories);
     const productCount = countProductsByCategory(products)
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [loadingCategories, setLoadingCategories] = useState(true);
 
-    useEffect(() => {
-        server.loadProducts().then(({error, result}) => {
-            if (error) {
-                setErrorLoadProducts(`Product loading error: ${error}`);
-                return;
-            }
-            if (Array.isArray(result)) {
-                dispatch(loadProducts(result));
-            } else {
-                console.error("Unexpected data structure:", result);
-            }
-        });
-        server.loadCategories().then(({error, result}) => {
-            if (error) {
-                setErrorLoadCategories(`Categories loading error: ${error}`);
-                return
-            }
-            if (Array.isArray(result)) {
-                dispatch(loadCategories(result));
-            } else {
-                console.error("Unexpected data structure:", result)
-            }
-        })
-    }, [dispatch]);
 
     const filteredProducts = Array.isArray(products) ? products.filter(product => {
         return (
@@ -64,6 +36,13 @@ const MainContainer = ({className}) => {
     const [errorLoadProducts, setErrorLoadProducts] = useState(null)
     const [errorLoadCategories, setErrorLoadCategories] = useState(null)
 
+    useLoadData(dispatch, {
+        setLoadingCategories,
+        setLoadingProducts,
+        setErrorLoadProducts,
+        setErrorLoadCategories
+    })
+
     const sortedProducts = [...filteredProducts]
     if (sortToggled === 'descending') {
         sortedProducts.sort((a, b) => {
@@ -73,10 +52,6 @@ const MainContainer = ({className}) => {
         sortedProducts.sort((a, b) => {
             return (Number(a.price) || 0) - (Number(b.price) || 0);
         });
-    }
-
-    const handleClick = (product) => {
-        dispatch(selectProduct(product))
     }
 
     const handleValue = (e) => {
@@ -89,55 +64,66 @@ const MainContainer = ({className}) => {
     }
     return (
         <div className={className}>
-
-            {errorLoadCategories ? null :
-                (<div className="main-categories">
-                    <p>Categories</p>
-                    <ul>
-                        {errorLoadCategories ? (
-                                <div>{errorLoadCategories}</div>
-                            ) :
-                            categories.map((item) => (
+            {(loadingProducts || loadingCategories) ? (
+                <Loader/>
+            ) : errorLoadProducts ? (
+                <div>{errorLoadProducts}</div>
+            ) : errorLoadCategories ? (
+                <div>{errorLoadCategories}</div>
+            ) : (
+                <>
+                    <div className="main-categories">
+                        <p>Categories</p>
+                        <ul>
+                            {categories.map((item) => (
                                 <li className="active" key={item.id}
                                     onClick={() => handleCategories(item.category)}>
                                     <span>{item.name}</span>
                                     <span>{productCount[item.category] || 0}</span>
                                 </li>
                             ))}
-                        <li className="active"
-                            onClick={() => dispatch(setCategories(null))}>
-                            <span>All categories</span>
-                        </li>
-                    </ul>
-                </div>)
-            }
-            {errorLoadProducts ? (
-                <div>{errorLoadProducts}</div>
-            ) : sortedProducts.length === 0 ? (<Loader/>) : (
-                <div className="main-cards">
-                    <select value={sortToggled} name="sort" id="sort"
-                            onChange={handleValue}>
-                        <option value="reset">Sort by default</option>
-                        <option value="descending">Descending</option>
-                        <option value="ascending">Ascending</option>
-                    </select>
-                    <div className="cards">
-                        {sortedProducts.map((item) => (
-                            <Link to="/product" className="card" key={item.id}
-                                  onClick={() => handleClick(item)}>
-                                <img
-                                    src={productImages[item.image_url.replace('.png', '')]}
-                                    alt={item.name}/>
-                                <div className="product-description">
-                                    <div
-                                        className="product-name">{item.name}</div>
-                                    <div
-                                        className="product-price">$ {item.price}.00
-                                    </div>
-                                </div>
-                            </Link>))}
+                            <li className="active"
+                                onClick={() => dispatch(setCategories(null))}>
+                                <span>All categories</span>
+                            </li>
+                        </ul>
                     </div>
-                </div>)}
+
+                    <div className="main-cards">
+                        <select value={sortToggled} name="sort" id="sort"
+                                onChange={handleValue}>
+                            <option value="reset">Sort by default</option>
+                            <option value="descending">Descending</option>
+                            <option value="ascending">Ascending</option>
+                        </select>
+
+                        {sortedProducts.length === 0 ? (
+                            <div style={{padding: '20px'}}>No products
+                                found.</div>
+                        ) : (
+                            <div className="cards">
+                                {sortedProducts.map((item) => (
+                                    <Link to={`/product/${item.id}`}
+                                          className="card"
+                                          key={item.id}>
+                                        <img
+                                            src={productImages[item.image_url.replace('.png', '')]}
+                                            alt={item.name}/>
+                                        <div className="product-description">
+                                            <div
+                                                className="product-name">{item.name}</div>
+                                            <div
+                                                className="product-price">$ {item.price}.00
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+
         </div>
     )
 }

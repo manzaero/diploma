@@ -7,14 +7,20 @@ const LoaderContainer = ({className}) => {
 export const Loader = styled(LoaderContainer)`
     width: 65px;
     aspect-ratio: 1;
+    margin: auto;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &::before,
     &::after {
         content: "";
         position: absolute;
-        border-radius: 50px;
-        box-shadow: 0 0 0 3px inset #fff;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px inset #46A358;
         animation: l4 2.5s infinite;
     }
 

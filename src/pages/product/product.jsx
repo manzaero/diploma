@@ -1,32 +1,41 @@
 import styled from "styled-components";
 import {useDispatch, useSelector} from "react-redux";
-import {selectProduct} from '../../selectors/index.js'
 import {productImages} from "../../assets/product-image/index.js";
-import {addToCart} from "../../action/index.js";
+import {addToCart, productById} from "../../action/index.js";
 import {useUserRole} from "../../constants/index.js";
+import {useParams} from "react-router-dom";
+import {useEffect} from "react";
+import {selectProduct} from "../../selectors/index.js";
 
 const ProductContainer = ({className}) => {
-    const product = useSelector(selectProduct)
+    const selectedProduct = useSelector(selectProduct)
     const dispatch = useDispatch();
     const userRole = useUserRole()
+    const {id} = useParams()
+
+    useEffect(() => {
+        if (id) {
+            dispatch(productById(id))
+        }
+    }, [dispatch, id])
+
     if (
-        !product ||
-        !product.selectedProduct ||
-        Array.isArray(product.selectedProduct) ||
-        !product.selectedProduct.image_url
+        !selectedProduct ||
+        Array.isArray(selectedProduct.selectedProduct) ||
+        !selectedProduct.selectedProduct.image_url
     ) {
         return <div>Product not found</div>;
     }
-    const image = productImages[product.selectedProduct.image_url.replace('.png', '')]
+    const image = productImages[selectedProduct.selectedProduct.image_url.replace('.png', '')]
 
-    console.log(product)
+    console.log(selectedProduct)
 
     const addProductToCart = () => {
         dispatch(addToCart({
-            id: product.selectedProduct.id,
-            name: product.selectedProduct.name,
-            price: product.selectedProduct.price,
-            image_url: product.selectedProduct.image_url.replace('.png', '')
+            id: selectedProduct.selectedProduct.id,
+            name: selectedProduct.selectedProduct.name,
+            price: selectedProduct.selectedProduct.price,
+            image_url: selectedProduct.selectedProduct.image_url.replace('.png', '')
         }))
     }
 
@@ -40,18 +49,18 @@ const ProductContainer = ({className}) => {
             </div>
             <div>
                 <div className="title">
-                    <p className="product-name">{product.selectedProduct.name}</p>
+                    <p className="product-name">{selectedProduct.selectedProduct.name}</p>
                     <div className="product-stock">
-                        <p className="product-price">$ {product.selectedProduct.price}.00</p>
+                        <p className="product-price">$ {selectedProduct.selectedProduct.price}.00</p>
                         <p className="product-in-stock">In
-                            stock: {product.selectedProduct.count}</p>
+                            stock: {selectedProduct.selectedProduct.count}</p>
                     </div>
                 </div>
                 <div className="hr"></div>
                 <div className="title-description">
                     <div className="description-title">Short Description:</div>
                     <div className="description-text">
-                        {product.selectedProduct.product_description}
+                        {selectedProduct.selectedProduct.product_description}
                     </div>
                     <div className="product-buy">
                         {userRole ?

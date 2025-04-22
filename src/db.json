@@ -123,8 +123,16 @@
   "cart": [
     {
       "id": "2255",
-      "items": [],
-      "sum": 0
+      "items": [
+        {
+          "id": "006",
+          "name": "Aluminum Plant",
+          "price": 179,
+          "image_url": "aluminumPlant",
+          "quantity": 4
+        }
+      ],
+      "sum": 716
     },
     {
       "id": "ad34",

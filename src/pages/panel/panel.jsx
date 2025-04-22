@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {Button, Title} from "../../components/index.js";
+import {Button, Loader, Title} from "../../components/index.js";
 import {useEffect, useState} from "react";
 import {server} from "../../bff/index.js";
 import {addProduct, loadCategories, loadProducts} from "../../action/index.js";
@@ -24,7 +24,8 @@ const AdminPanelContainer = ({className}) => {
         count: "",
         product_description: ''
     });
-    console.log(products)
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [loadingCategory, setLoadingCategory] = useState(true);
 
     const handleChange = (id, field, value) => {
         setChangeProduct(prev => ({
@@ -102,6 +103,7 @@ const AdminPanelContainer = ({className}) => {
 
     useEffect(() => {
         server.loadProducts().then(({error, result}) => {
+            setLoadingProducts(false)
             if (error) {
                 setErrorLoadProducts(`product loading error: ${error}`);
                 return;
@@ -113,6 +115,7 @@ const AdminPanelContainer = ({className}) => {
             }
         });
         server.loadCategories().then(({error, result}) => {
+            setLoadingCategory(false)
             if (error) {
                 setErrorLoadCategory('error load products')
                 return
@@ -183,104 +186,112 @@ const AdminPanelContainer = ({className}) => {
                 <Button width={"240"} type="submit">{"Create"}</Button>
             </form>
 
-            <table className="cart-table">
-                <thead>
-                <tr>
-                    <th>Products</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {
-                    errorLoadProducts ? (
-                        <div>Error loading or products not found</div>
-                    ) : (
-                        products.map((item) => {
-                            const current = changeProduct[item.id] || item;
-                            return (<tr key={item.id}>
-                                <td>
-                                    <div className="product-info">
-                                        <img
-                                            src={productImages[current.image_url.replace('.png', '')]}
-                                            alt="item.name"/>
-                                        <div>
-                                            <input
-                                                value={current.name}
-                                                onChange={e => handleChange(item.id, "name", e.target.value)}
-                                            />
-                                            <p className="sku">
-                                                <span>Category:</span>
-                                                <select
-                                                    value={current.category}
-                                                    onChange={e => handleChange(item.id, "category", e.target.value)}
-                                                >
-                                                    {!errorLoadCategory ?
-                                                        categories.map((category) => (
-                                                            <option
-                                                                key={category.id}
-                                                                value={category.category}>
-                                                                {category.name}
-                                                            </option>
-                                                        )) : errorLoadCategory
-                                                    }
-                                                </select>
-                                            </p>
-                                            <p className="sku">
-                                                <span>Image</span>:
-                                                <select
-                                                    value={current.image_url}
-                                                    onChange={e => handleChange(item.id, "image_url", e.target.value)}
-                                                >
-                                                    {Object.keys(productImages).map((imgKey) => (
-                                                        <option key={imgKey}
-                                                                value={`${imgKey}.png`}>
-                                                            {imgKey}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input value={current.price}
-                                           onChange={e => handleChange(item.id, "price", +e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <div className="quantity-control">
-                                        <button
-                                            onClick={() => handleChange(item.id, "count", Math.max(current.count - 1, 0))}>-
-                                        </button>
-                                        <span>{current.count}</span>
-                                        <button
-                                            onClick={() => handleChange(item.id, "count", current.count + 1)}>+
-                                        </button>
-                                    </div>
-                                </td>
-                                <td className="total">${current.price * current.count}.00</td>
-                                <td className="btn-save">
-                                    <Button children={"Save"}
-                                            width={"90"}
-                                            onClick={() => handleSave(current.id)}
-                                    />
-                                    <div className="delete-btn">
-                                        <button
-                                            onClick={() => handleDeleteProduct(item.id)}>
+            {(loadingProducts || loadingCategory) ? (
+                <div>
+                    <Loader/>
+                </div>
+            ) : errorLoadProducts ? (
+                <div>Error loading products</div>
+            ) : (
+                <table className="cart-table">
+                    <thead>
+                    <tr>
+                        <th>Products</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        errorLoadProducts ? (
+                            <div>Error loading or products not found</div>
+                        ) : (
+                            products.map((item) => {
+                                const current = changeProduct[item.id] || item;
+                                return (<tr key={item.id}>
+                                    <td>
+                                        <div className="product-info">
                                             <img
-                                                src={icons.delete}
-                                                alt=""/></button>
-                                    </div>
-                                </td>
-                            </tr>)
-                        })
-                    )
-                }
-                </tbody>
-            </table>
+                                                src={productImages[current.image_url.replace('.png', '')]}
+                                                alt="item.name"/>
+                                            <div>
+                                                <input
+                                                    value={current.name}
+                                                    onChange={e => handleChange(item.id, "name", e.target.value)}
+                                                />
+                                                <p className="sku">
+                                                    <span>Category:</span>
+                                                    <select
+                                                        value={current.category}
+                                                        onChange={e => handleChange(item.id, "category", e.target.value)}
+                                                    >
+                                                        {!errorLoadCategory ?
+                                                            categories.map((category) => (
+                                                                <option
+                                                                    key={category.id}
+                                                                    value={category.category}>
+                                                                    {category.name}
+                                                                </option>
+                                                            )) : errorLoadCategory
+                                                        }
+                                                    </select>
+                                                </p>
+                                                <p className="sku">
+                                                    <span>Image</span>:
+                                                    <select
+                                                        value={current.image_url}
+                                                        onChange={e => handleChange(item.id, "image_url", e.target.value)}
+                                                    >
+                                                        {Object.keys(productImages).map((imgKey) => (
+                                                            <option key={imgKey}
+                                                                    value={`${imgKey}.png`}>
+                                                                {imgKey}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <input value={current.price}
+                                               onChange={e => handleChange(item.id, "price", +e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <div className="quantity-control">
+                                            <button
+                                                onClick={() => handleChange(item.id, "count", Math.max(current.count - 1, 0))}>-
+                                            </button>
+                                            <span>{current.count}</span>
+                                            <button
+                                                onClick={() => handleChange(item.id, "count", current.count + 1)}>+
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td className="total">${current.price * current.count}.00</td>
+                                    <td className="btn-save">
+                                        <Button children={"Save"}
+                                                width={"90"}
+                                                onClick={() => handleSave(current.id)}
+                                        />
+                                        <div className="delete-btn">
+                                            <button
+                                                onClick={() => handleDeleteProduct(item.id)}>
+                                                <img
+                                                    src={icons.delete}
+                                                    alt=""/></button>
+                                        </div>
+                                    </td>
+                                </tr>)
+                            })
+                        )
+                    }
+                    </tbody>
+                </table>
+            )}
 
         </div>
     )

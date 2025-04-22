@@ -1,18 +1,17 @@
 import {ACTION_TYPE} from "../action/index.js";
 
 const initialProductState = {
-    selectedProduct: [],
-}
+    selectedProduct: null,
+};
 
 export const productReducer = (state = initialProductState, action) => {
     switch (action.type) {
-        case ACTION_TYPE.SELECT_PRODUCT: {
+        case ACTION_TYPE.SELECT_PRODUCT:
             return {
                 ...state,
-                selectedProduct: action.payload
-            }
-        }
+                selectedProduct: action.payload,
+            };
         default:
-            return state
+            return state;
     }
-}
+};

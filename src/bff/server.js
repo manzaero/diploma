@@ -165,5 +165,22 @@ export const server = {
                 result: null
             }
         }
+    },
+    async getProduct(id) {
+        try {
+            const res = await fetch(`http://localhost:3005/products/${id}`);
+            if (!res.ok) throw new Error('Product not found');
+            const product = await res.json();
+            return {
+                error: null,
+                result: product
+            };
+        } catch (e) {
+            return {
+                error: e.message,
+                result: null
+            };
+        }
     }
+
 }
